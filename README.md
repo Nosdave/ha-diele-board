@@ -65,9 +65,13 @@ ha-diele-board/
 
 Dieses Repo ist so aufgebaut, dass jemand anderes es nachbauen kann: Stückliste mit Bezugsquellen,
 reproduzierbare ESPHome- und HA-Konfiguration, Secrets nur als `*.example`, Doku pro Schicht. Vor einer
-Veröffentlichung: Secrets prüfen, Lizenz festlegen (aktuell **TBD**), Fotos ergänzen.
+Veröffentlichung: Secrets prüfen, Fotos/Badges ergänzen, Release-Tag setzen (Lizenz = **MIT**, siehe unten).
 
 ## Abgrenzung
 
 Das bestehende „transit"-HTML-Dashboard in HA ist **keine** Abhängigkeit dieses Projekts — es dient nur als
 Lernquelle (Key/IDs). Dessen Überführung in eine echte HA-Integration ist ein **separates** Projekt.
+
+## Lizenz
+
+[MIT](LICENSE) © 2026 Nosdave
