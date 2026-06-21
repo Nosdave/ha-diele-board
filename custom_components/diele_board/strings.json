@@ -13,8 +13,6 @@
           "train_station": "Train station (iRail id)",
           "train_platform": "Inbound platform (empty = no filter)",
           "weather_entity": "Weather entity",
-          "min_temp_entity": "Min temperature sensor (optional)",
-          "max_temp_entity": "Max temperature sensor (optional)",
           "presence_entities": "Presence sensors / Diele",
           "commute_label_1": "Commute 1 label (e.g. a name)",
           "commute_label_2": "Commute 2 label (e.g. a name)"
@@ -42,8 +40,6 @@
           "train_station": "Train station (iRail id)",
           "train_platform": "Inbound platform (empty = no filter)",
           "weather_entity": "Weather entity",
-          "min_temp_entity": "Min temperature sensor (optional)",
-          "max_temp_entity": "Max temperature sensor (optional)",
           "presence_entities": "Presence sensors / Diele",
           "commute_label_1": "Commute 1 label (e.g. a name)",
           "commute_label_2": "Commute 2 label (e.g. a name)"

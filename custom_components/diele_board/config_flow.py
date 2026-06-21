@@ -20,8 +20,6 @@ from .const import (
     CONF_BUS_POINT,
     CONF_COMMUTE_LABEL_1,
     CONF_COMMUTE_LABEL_2,
-    CONF_MAX_TEMP_ENTITY,
-    CONF_MIN_TEMP_ENTITY,
     CONF_PARTNER_KEY,
     CONF_PRESENCE_ENTITIES,
     CONF_TRAIN_PLATFORM,
@@ -33,46 +31,42 @@ from .const import (
     DEFAULT_BUS_POINT,
     DEFAULT_COMMUTE_LABEL_1,
     DEFAULT_COMMUTE_LABEL_2,
-    DEFAULT_PRESENCE_ENTITIES,
     DEFAULT_TRAIN_PLATFORM,
     DEFAULT_TRAIN_STATION,
     DEFAULT_TRAM_LINE,
     DEFAULT_TRAM_POINT,
-    DEFAULT_WEATHER_ENTITY,
     DOMAIN,
 )
 
-_SENSOR = selector.EntitySelector(selector.EntitySelectorConfig(domain="sensor"))
-
 
 def _schema(d: dict[str, Any]) -> vol.Schema:
-    """Build the config/options schema, pre-filled from ``d``."""
-    return vol.Schema(
-        {
-            vol.Required(CONF_PARTNER_KEY, default=d.get(CONF_PARTNER_KEY, "")): str,
-            vol.Required(CONF_TRAM_POINT, default=d.get(CONF_TRAM_POINT, DEFAULT_TRAM_POINT)): str,
-            vol.Required(CONF_TRAM_LINE, default=d.get(CONF_TRAM_LINE, DEFAULT_TRAM_LINE)): str,
-            vol.Required(CONF_BUS_POINT, default=d.get(CONF_BUS_POINT, DEFAULT_BUS_POINT)): str,
-            vol.Required(CONF_BUS_LINE, default=d.get(CONF_BUS_LINE, DEFAULT_BUS_LINE)): str,
-            vol.Required(CONF_TRAIN_STATION, default=d.get(CONF_TRAIN_STATION, DEFAULT_TRAIN_STATION)): str,
-            vol.Optional(CONF_TRAIN_PLATFORM, default=d.get(CONF_TRAIN_PLATFORM, DEFAULT_TRAIN_PLATFORM)): str,
-            vol.Optional(CONF_WEATHER_ENTITY, default=d.get(CONF_WEATHER_ENTITY, DEFAULT_WEATHER_ENTITY)): selector.EntitySelector(
-                selector.EntitySelectorConfig(domain="weather")
-            ),
-            vol.Optional(CONF_MIN_TEMP_ENTITY, default=d.get(CONF_MIN_TEMP_ENTITY, "")): _SENSOR,
-            vol.Optional(CONF_MAX_TEMP_ENTITY, default=d.get(CONF_MAX_TEMP_ENTITY, "")): _SENSOR,
-            vol.Optional(
-                CONF_PRESENCE_ENTITIES,
-                default=d.get(CONF_PRESENCE_ENTITIES, DEFAULT_PRESENCE_ENTITIES),
-            ): selector.EntitySelector(
-                selector.EntitySelectorConfig(
-                    domain=["binary_sensor", "input_boolean", "person"], multiple=True
-                )
-            ),
-            vol.Optional(CONF_COMMUTE_LABEL_1, default=d.get(CONF_COMMUTE_LABEL_1, DEFAULT_COMMUTE_LABEL_1)): str,
-            vol.Optional(CONF_COMMUTE_LABEL_2, default=d.get(CONF_COMMUTE_LABEL_2, DEFAULT_COMMUTE_LABEL_2)): str,
-        }
-    )
+    """Build the config/options schema, pre-filled from ``d``.
+
+    Optional entity selectors use ``suggested_value`` (not ``default``) so they can
+    be left empty — a default of "" is an invalid entity and would force a pick.
+    """
+    fields: dict[Any, Any] = {
+        vol.Required(CONF_PARTNER_KEY, default=d.get(CONF_PARTNER_KEY, "")): str,
+        vol.Required(CONF_TRAM_POINT, default=d.get(CONF_TRAM_POINT, DEFAULT_TRAM_POINT)): str,
+        vol.Required(CONF_TRAM_LINE, default=d.get(CONF_TRAM_LINE, DEFAULT_TRAM_LINE)): str,
+        vol.Required(CONF_BUS_POINT, default=d.get(CONF_BUS_POINT, DEFAULT_BUS_POINT)): str,
+        vol.Required(CONF_BUS_LINE, default=d.get(CONF_BUS_LINE, DEFAULT_BUS_LINE)): str,
+        vol.Required(CONF_TRAIN_STATION, default=d.get(CONF_TRAIN_STATION, DEFAULT_TRAIN_STATION)): str,
+        vol.Optional(CONF_TRAIN_PLATFORM, default=d.get(CONF_TRAIN_PLATFORM, DEFAULT_TRAIN_PLATFORM)): str,
+        vol.Optional(
+            CONF_WEATHER_ENTITY, description={"suggested_value": d.get(CONF_WEATHER_ENTITY)}
+        ): selector.EntitySelector(selector.EntitySelectorConfig(domain="weather")),
+        vol.Optional(
+            CONF_PRESENCE_ENTITIES, description={"suggested_value": d.get(CONF_PRESENCE_ENTITIES)}
+        ): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=["binary_sensor", "input_boolean", "person"], multiple=True
+            )
+        ),
+        vol.Optional(CONF_COMMUTE_LABEL_1, default=d.get(CONF_COMMUTE_LABEL_1, DEFAULT_COMMUTE_LABEL_1)): str,
+        vol.Optional(CONF_COMMUTE_LABEL_2, default=d.get(CONF_COMMUTE_LABEL_2, DEFAULT_COMMUTE_LABEL_2)): str,
+    }
+    return vol.Schema(fields)
 
 
 async def _validate(hass, user_input: dict[str, Any]) -> dict[str, str]:

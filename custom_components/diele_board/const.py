@@ -56,8 +56,6 @@ CONF_BUS_LINE = "bus_line"
 CONF_TRAIN_STATION = "train_station"
 CONF_TRAIN_PLATFORM = "train_platform"  # inbound filter; "" = no filter
 CONF_WEATHER_ENTITY = "weather_entity"
-CONF_MIN_TEMP_ENTITY = "min_temp_entity"
-CONF_MAX_TEMP_ENTITY = "max_temp_entity"
 CONF_PRESENCE_ENTITIES = "presence_entities"
 CONF_COMMUTE_LABEL_1 = "commute_label_1"
 CONF_COMMUTE_LABEL_2 = "commute_label_2"
