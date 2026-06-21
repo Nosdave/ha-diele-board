@@ -22,8 +22,6 @@ from .const import (
     COMMUTE_SLOTS,
     CONF_BUS_LINE,
     CONF_BUS_POINT,
-    CONF_MAX_TEMP_ENTITY,
-    CONF_MIN_TEMP_ENTITY,
     CONF_PARTNER_KEY,
     CONF_PRESENCE_ENTITIES,
     CONF_TRAIN_PLATFORM,
@@ -111,8 +109,8 @@ class DieleBoardCoordinator(DataUpdateCoordinator):
         return {
             "mode": self._mode(now),
             "present": self._presence(),
-            "weather": self._weather(),
             "commute": await self._commutes(now),
+            "weather": await self._weather(),
             "alert": self._manual_alert or self._pick_alert(disruptions, {tram_line, bus_line}),
             "transit_fallback": {
                 "tram": self._format_stib(tram, tram_line, now),
@@ -179,19 +177,31 @@ class DieleBoardCoordinator(DataUpdateCoordinator):
             (st := self.hass.states.get(e)) and st.state in _PRESENT for e in ents
         )
 
-    def _weather(self) -> dict[str, Any]:
+    async def _weather(self) -> dict[str, Any]:
         out: dict[str, Any] = {}
-        if we := self._cfg.get(CONF_WEATHER_ENTITY):
-            if st := self.hass.states.get(we):
-                out["icon"] = st.state
-                if (t := st.attributes.get("temperature")) is not None:
-                    out["now"] = t
-        for key, conf in (("min", CONF_MIN_TEMP_ENTITY), ("max", CONF_MAX_TEMP_ENTITY)):
-            if (e := self._cfg.get(conf)) and (st := self.hass.states.get(e)) and st.state not in _UNAVAIL:
-                try:
-                    out[key] = float(st.state)
-                except ValueError:
-                    pass
+        we = self._cfg.get(CONF_WEATHER_ENTITY)
+        if not we:
+            return out
+        if st := self.hass.states.get(we):
+            out["icon"] = st.state
+            if (t := st.attributes.get("temperature")) is not None:
+                out["now"] = t
+        # today's min/max from the weather entity's own daily forecast
+        try:
+            resp = await self.hass.services.async_call(
+                "weather", "get_forecasts",
+                {"entity_id": we, "type": "daily"},
+                blocking=True, return_response=True,
+            )
+            forecast = ((resp or {}).get(we) or {}).get("forecast") or []
+            if forecast:
+                today = forecast[0]
+                if (lo := today.get("templow")) is not None:
+                    out["min"] = lo
+                if (hi := today.get("temperature")) is not None:
+                    out["max"] = hi
+        except Exception as err:  # noqa: BLE001
+            _LOGGER.debug("diele_board: forecast unavailable: %s", err)
         return out
 
     async def _commutes(self, now) -> list[dict[str, Any]]:

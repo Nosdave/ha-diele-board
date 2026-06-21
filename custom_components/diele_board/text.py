@@ -15,6 +15,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import COMMUTE_SLOTS, DOMAIN
+from .entity import board_device
 
 
 async def async_setup_entry(
@@ -38,6 +39,7 @@ class DieleDestinationText(TextEntity, RestoreEntity):
         self._slot = slot
         self._attr_name = f"Destination {coordinator.label_for(slot)}"
         self._attr_unique_id = f"{entry.entry_id}_dest_{slot}"
+        self._attr_device_info = board_device(entry)
         self._attr_native_value = ""
 
     async def async_added_to_hass(self) -> None:

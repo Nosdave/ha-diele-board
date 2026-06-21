@@ -7,6 +7,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
+from .entity import board_device
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
@@ -25,6 +27,7 @@ class DieleBrightnessNumber(NumberEntity, RestoreEntity):
 
     def __init__(self, entry: ConfigEntry) -> None:
         self._attr_unique_id = f"{entry.entry_id}_brightness"
+        self._attr_device_info = board_device(entry)
         self._attr_native_value = 180
 
     async def async_added_to_hass(self) -> None:
